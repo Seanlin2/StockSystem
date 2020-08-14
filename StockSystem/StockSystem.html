@@ -7,10 +7,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC&display=swap" rel="stylesheet">
     <style type="css/text" src="custom.css"></style>
     <title>StockSystem</title>
-    <style>        
+    <style>      
+        body{
+            font-family: 'Noto Serif TC', serif;
+        }  
         .left_menu{
             background-color: #12486f;
             padding: 10px 0px 0px 0px;
@@ -37,6 +41,13 @@
             list-style: none;
         }
     
+
+        @media only screen and (max-width: 576px) {
+            .left_menu{                
+                padding: 0px;
+            }
+
+        }   
         @media only screen and (min-width: 576px) {
             .left_menu .btn {
                 /* color: rgba(2, 255, 255, .5);   */
@@ -95,41 +106,57 @@
             
                     <div class="left_menu col-sm-2">
                         <div v-for="item in LeftMenu" @click="ShowPage(item);" class="btn ">
-                            <h6>{{item.name}}</h6>
+                            <h4>{{item.name}}</h6>
                         </div>
                     </div>
                     <div class="content col-sm-10 container">
                     
-                        <div v-if="sishow" class="stockitem">
-                            <h2>Stock Management1</h2>
+                        <div v-if="LeftMenu[0].show" class="stockitem">
+                            <h2>{{LeftMenu[0].name}}</h2>
                             <ul class="list-group">
                                 <li class="list-group-item">
-                    
+                                    <input class="" type="button" name="add">
+                                    <input class="" type="button" name="minor">
                                 </li>
-                                <li class="list-group-item">
-                                    444
+                                <li class="list-group-item add" >
+                                    <input class="" type="text" name="name">
+                                    <input class="" type="number" name="number">
+
+                                    <select name="itemtype" v-model="newItem.type">
+                                        <option v-for="type in DBList[1]" v-bind:value="type.id">
+                                            {{type.name}} 
+                                        </option>
+                                    </select>
+
+                                    <button type="button" class="btn btn-primary" title="Add" @Click="AddItem()"></button>
                                 </li>
                             </ul>
                         </div>
                     
                     
-                        <div v-if="sitshow" class="stockitemtype">
-                            <h2>Stock Management2</h2>
+                        <div v-if="LeftMenu[1].show" class="stockitemtype">
+                            <h2>{{LeftMenu[1].name}}</h2>
+                            <ul class="list-group">
+                                <li class="list-group-item">111</li>
+                                <li class="list-group-item add">
+                                    <input class="" v-model="newType.name" type="text" name="name">
+                                    <button type="button" class="btn btn-primary" title="Add" @Click="AddItem()"></button>
+                                </li>
+                            </ul>
+                        </div>
+                    
+                    
+                        <div v-if="LeftMenu[2].show" class="stockitemLog">
+                            <h2>{{LeftMenu[2].name}}</h2>
                             <ul class="list-group">
                                 <li class="list-group-item">111</li>
                                 <li class="list-group-item">111</li>
                             </ul>
                         </div>
-                    
-                    
-                        <div v-if="silshow" class="stockitemLog">
-                            <h2>Stock Management3</h2>
-                            <ul class="list-group">
-                                <li class="list-group-item">111</li>
-                                <li class="list-group-item">111</li>
-                            </ul>
+                        <div v-if="LeftMenu[3].show" class="stockitemLog">
+                            <h2>{{LeftMenu[3].name}}</h2>
+                            
                         </div>
-                    
                     </div>
             
                 </div>
@@ -144,35 +171,25 @@
     var Main = new Vue({
         el: "#main",
         data: {
-            _DBList:[],
+            DBList:[],
             LeftMenu:[
-                {name:'商品管理',id:1},
-                {name:'類別管理',id:2},
-                {name:'調整紀錄',id:3}
+                {name:'商品管理',id:1,show:true},
+                {name:'類別管理',id:2,show:false},
+                {name:'調整紀錄',id:3,show:false},
+                {name:'匯入匯出',id:4,show:false}
                 ],
-            sishow:true,
-            sitshow:false,
-            silshow:false,
+            newItem:{id:0,name:"名稱"},
+            newType:{id:0,name:"名稱"},
+            newLog:{adjust:0,itemid:0}
         },
         created: function () {
             this.LoadData();            
         },
         methods: {
             ShowPage(e){
-                this._data.sishow = false;
-                this._data.sitshow = false;
-                this._data.silshow = false;
-                switch(e.name){
-                    case '商品管理':
-                        this._data.sishow = true;
-                        break;
-                    case '類別管理':
-                        this._data.sitshow = true;
-                        break;
-                    case '調整紀錄':
-                        this._data.silshow = true;
-                        break;
-                }
+                this._data.LeftMenu.forEach(function(e){e.show = false;});
+
+                e.show = true;
             },
             InitTable(){
                 this.AddTable('StockItem');
@@ -186,32 +203,32 @@
                     Name:TableName,
                     Data:[]
                 };
-                this._data._DBList.push(newTable)
+                this._data.DBList.push(newTable)
             },
             GetTableById(Id){
-                this._data._DBList.find(function(e){
+                this._data.DBList.find(function(e){
                     return e.Id ===Id;
                 })
             },
             GetTableByName(Name){
-                this._data._DBList.find(function(e){
+                this._data.DBList.find(function(e){
                     return e.Id ===Id;
                 })
             },
             GetMaxDBListId(){
-                return this._data._DBList.length;
+                return this._data.DBList.length;
             },
             ToJson(obj){
                 return JSON.stringify(obj);
                 //JSON.parse()
             },
             SaveData(){
-                localStorage.setItem('Alldata', JSON.stringify(this._data._DBList));
+                localStorage.setItem('Alldata', JSON.stringify(this._data.DBList));
             },
             LoadData(){
                 let AlldataStr = localStorage.getItem('Alldata');
                 if(AlldataStr != null){
-                    Main._data._DBList = JSON.parse(AlldataStr);
+                    Main._data.DBList = JSON.parse(AlldataStr);
                 }else{
                     this.InitTable();
                 }
