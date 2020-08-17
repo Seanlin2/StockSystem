@@ -40,7 +40,20 @@
         ul {
             list-style: none;
         }
-    
+        
+        .editmod{
+            display: none;
+        }
+
+        .columnbox{
+            display: inline-block;
+            margin: 0px 5px;
+            min-width: 100px;
+            background-color: aliceblue;
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+        }
 
         @media only screen and (max-width: 576px) {
             .left_menu{                
@@ -92,7 +105,7 @@
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">連結</a>
+                        <a class="nav-link" @Click="SetShop(0);">賢夫美食</a>
                     </li>
                    
                 </ul>
@@ -114,21 +127,37 @@
                         <div v-if="LeftMenu[0].show" class="stockitem">
                             <h2>{{LeftMenu[0].name}}</h2>
                             <ul class="list-group">
-                                <li class="list-group-item">
-                                    <input class="" type="button" name="add">
-                                    <input class="" type="button" name="minor">
+                                <li class="list-group-item" >
+                                    <div class="columnbox">編號</div>
+                                    <div class="columnbox">名稱</div>
+                                    <div class="columnbox">類別</div>
+                                    <div class="columnbox">庫存</div>
+                                    <div class="columnbox">管理</div>
+                                    
+                                </li>
+                                <li class="list-group-item" v-for="item in DBList[0].data">
+                                    <div class="columnbox">{{item.id}} </div>
+                                    <div class="columnbox">{{item.name}} </div>
+                                    <div class="columnbox">{{GetItemFormArrById(DBList[1].data,item.typeid).name}} </div>
+                                    <div class="columnbox">{{item.number}} </div>
+                                    <div class="columnbox">
+                                        <input type="number" name="adjust" style="width: 40px;" >
+                                        <input class="" type="button" name="add" value="+" @Click="AddItemNb(item,this)">
+                                        <input class="" type="button" name="minor" value="-" @Click="MinorItemNb(item,this)">
+                                    </div>
                                 </li>
                                 <li class="list-group-item add" >
-                                    <input class="" type="text" name="name">
-                                    <input class="" type="number" name="number">
+                                    <input class="" type="text" name="name" v-model="newItem.name">
+                                    <input class="" type="number" name="number" placeholder="初始數量" v-model="newItem.number">
 
-                                    <select name="itemtype" v-model="newItem.type">
-                                        <option v-for="type in DBList[1]" v-bind:value="type.id">
+                                    <select name="itemtype" v-model="newItem.typeid">                                          
+                                        <option :value="null" disabled selected>選擇類別</option>
+                                        <option v-for="type in DBList[1].data" :value="type.id">
                                             {{type.name}} 
                                         </option>
                                     </select>
 
-                                    <button type="button" class="btn btn-primary" title="Add" @Click="AddItem()"></button>
+                                    <input type="button" class="btn btn-primary" title="Add" @Click="AddItem()" value="新增"></input>
                                 </li>
                             </ul>
                         </div>
@@ -137,10 +166,13 @@
                         <div v-if="LeftMenu[1].show" class="stockitemtype">
                             <h2>{{LeftMenu[1].name}}</h2>
                             <ul class="list-group">
-                                <li class="list-group-item">111</li>
+                                <li class="list-group-item" v-for="type in DBList[1].data">
+                                    <div class="viewmod">{{type.name}} </div>
+                                    <input class="editmod" type="text" name="name" value="type.name">
+                                </li>
                                 <li class="list-group-item add">
                                     <input class="" v-model="newType.name" type="text" name="name">
-                                    <button type="button" class="btn btn-primary" title="Add" @Click="AddItem()"></button>
+                                    <input type="button" class="btn btn-primary" title="Add" @Click="AddType()" value="新增"></input>
                                 </li>
                             </ul>
                         </div>
@@ -155,7 +187,16 @@
                         </div>
                         <div v-if="LeftMenu[3].show" class="stockitemLog">
                             <h2>{{LeftMenu[3].name}}</h2>
-                            
+                            <div>
+                                <textarea v-model="DataStr" style="width: 1000px;min-height: 120px;"></textarea>
+                                <input type="button" @click="LoadDataByStr()" value="匯入">
+                            </div>
+                            <hr>
+                            <div>
+                            寄信給自己
+                            <input v-model="useremail" type="text" placeholder="email" style="width: 200px;">
+                            <input type="button" @click="SendEmail(useremail);" value="寄送">
+                            </div>
                         </div>
                     </div>
             
@@ -178,14 +219,29 @@
                 {name:'調整紀錄',id:3,show:false},
                 {name:'匯入匯出',id:4,show:false}
                 ],
-            newItem:{id:0,name:"名稱"},
-            newType:{id:0,name:"名稱"},
-            newLog:{adjust:0,itemid:0}
+            DataStr:"",
+            newItem:{id:0,name:"名稱",typeid:null,number:0},
+            newType:{id:0,name:"名稱"},            
+            newLog:{datetime:new Date(),adjust:0,itemid:0},
+            useremail:""
         },
         created: function () {
-            this.LoadData();            
+            this.LoadData();                   
+        },
+        computed: {
+            // a computed getter
+            
         },
         methods: {
+            SetShop(shopid){
+                switch(shopid){
+                    case 0:
+                    if(this.DBList[1].data.length == 0){
+                        this.DBList[1].data = JSON.parse('{"id":2,"name":"StockItemType","data":[{"id":1,"name":"餃類"},{"id":2,"name":"包子類"},{"id":3,"name":"酥餅"},{"id":4,"name":"甜品"}],"lastid":4}');
+                    }
+                    break;
+                }
+            },
             ShowPage(e){
                 this._data.LeftMenu.forEach(function(e){e.show = false;});
 
@@ -196,23 +252,69 @@
                 this.AddTable('StockItemType');
                 this.AddTable('StockItemLog');
             },
+            AddItemNb(item,e){
+                console.log(item);
+                console.log(e);
+            },
+            AddItem(){
+                //add
+                this.newItem.id = this._data.DBList[0].lastid +1;
+                this._data.DBList[0].lastid += 1;
+                this._data.DBList[0].data.push(
+                    {
+                        id:this.newItem.id,
+                        name:this.newItem.name,
+                        typeid:this.newItem.typeid,
+                        number:this.newItem.number
+                    }
+                )
+                //save
+                this.SaveData();
+                //clear
+                this.newItem.id = this._data.DBList[0].lastid;
+                this.newItem.name = '名稱';
+                this.newItem.typeid = 0;
+                this.newItem.number = 0;
+            },
+            AddType(){
+                //add
+                this.newType.id = this._data.DBList[1].lastid +1;
+                this._data.DBList[1].lastid += 1;
+                this._data.DBList[1].data.push(
+                    {
+                        id:this.newType.id,
+                        name:this.newType.name
+                    }
+                );
+                //save
+                this.SaveData();
+                //clear
+                this.newType.id = 0;
+                this.newType.name = '名稱';
+            },
             AddTable(TableName){
                 let newId = this.GetMaxDBListId() +1;
                 let newTable = {
-                    Id:newId,
-                    Name:TableName,
-                    Data:[]
+                    id:newId,
+                    name:TableName,
+                    data:[],
+                    lastid:0,
                 };
                 this._data.DBList.push(newTable)
             },
-            GetTableById(Id){
+            GetTableById(id){
                 this._data.DBList.find(function(e){
-                    return e.Id ===Id;
+                    return e.id ===id;
                 })
             },
             GetTableByName(Name){
                 this._data.DBList.find(function(e){
-                    return e.Id ===Id;
+                    return e.id ===id;
+                })
+            },
+            GetItemFormArrById(arr,id){
+                return arr.find(function(e){
+                    return e.id ===id;
                 })
             },
             GetMaxDBListId(){
@@ -224,14 +326,80 @@
             },
             SaveData(){
                 localStorage.setItem('Alldata', JSON.stringify(this._data.DBList));
+                localStorage.setItem('Alldata_b', JSON.stringify(this._data.DBList));
+                this.DataStr = JSON.stringify(this._data.DBList);
             },
             LoadData(){
                 let AlldataStr = localStorage.getItem('Alldata');
                 if(AlldataStr != null){
-                    Main._data.DBList = JSON.parse(AlldataStr);
+                    try {
+                        this._data.DBList = JSON.parse(AlldataStr);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                    
                 }else{
                     this.InitTable();
                 }
+                //Str
+                this.DataStr = JSON.stringify(this._data.DBList);
+            },
+            LoadDataByStr() {
+                try {
+                    var tmpdb = JSON.parse(this.DataStr);
+                    if(this.CheckData(tmpdb)){
+                        this._data.DBList = tmpdb;
+                        alert("匯入成功");
+                        //save
+                        this.SaveData();
+                    }else{
+                        alert("匯入失敗");
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            CheckData(tmpdb){
+                try {
+                    if(tmpdb[0].name !== "StockItem"){
+                        return false;
+                    }
+                    if(tmpdb[1].name !== "StockItemType"){
+                        return false;
+                    }
+                    if(tmpdb[2].name !== "StockItemLog"){
+                        return false;
+                    }
+                    return true;    
+                } catch (error) {
+                    return false
+                } 
+                
+            },
+            ClearData(){                
+                localStorage.removeItem('Alldata');
+                //setItem(): Add key and value to localStorage
+                //getItem(): Retrieve a value by the key from localStorage
+                //removeItem(): Remove an item by key from localStorage
+                //clear(): Clear all localStorage
+                //key(): Passed a number to retrieve nth key of a localStorage
+            },
+            Downloadfile(filename, text) {
+
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', filename);
+
+                element.style.display = 'none';
+                document.body.appendChild(element);
+
+                element.click();
+
+                document.body.removeChild(element);
+
+            },
+            SendEmail(email){
+                window.open('mailto:' + email + '?subject=庫存資料備份&body=###<br/>' + JSON.stringify(this.DBList) + "<br/>###");
             }
         }
       });
