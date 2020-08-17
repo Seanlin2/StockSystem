@@ -69,7 +69,9 @@
         .btnfr{
             float: right
         }
-
+        .form-control {
+            display: inline-block;
+        }
         @media only screen and (max-width: 576px) {
             .left_menu{                
                 padding: 0px;
@@ -143,27 +145,27 @@
                             <h2>{{LeftMenu[0].name}}</h2>
                             <ul class="list-group">
                                 <li class="list-group-item" >
-                                    <div class="columnboxhd">編號</div>
-                                    <div class="columnboxhd">名稱</div>
-                                    <div class="columnboxhd">類別</div>
-                                    <div class="columnboxhd">庫存</div>
-                                    <div class="columnboxhd">管理</div>
+                                    <div class="col-sm-1 columnboxhd">編號</div>
+                                    <div class="col-sm-3 columnboxhd">名稱</div>
+                                    <div class="col-sm-3 columnboxhd">類別</div>
+                                    <div class="col-sm-2 columnboxhd">庫存</div>
+                                    <div class="col-sm-2 columnboxhd">管理</div>
                                 </li>
                                 <li class="list-group-item" v-for="item in DBList[0].data">
-                                    <div class="columnbox">{{item.id}} </div>
-                                    <div class="columnbox">{{item.name}} </div>
-                                    <div class="columnbox">{{GetItemFormArrById(DBList[1].data,item.typeid).name}} </div>
-                                    <div class="columnbox">{{item.number}} </div>
-                                    <div class="columnbox">
-                                        <input type="number" name="adjust" style="width: 52px;" v-model="item.adjust" >
+                                    <div class="col-sm-1 columnbox">{{item.id}} </div>
+                                    <div class="col-sm-3 columnbox">{{item.name}} </div>
+                                    <div class="col-sm-3 columnbox">{{GetItemFormArrById(DBList[1].data,item.typeid).name}} </div>
+                                    <div class="col-sm-2 columnbox">{{item.number}} </div>
+                                    <div class="col-sm-2 columnbox">
+                                        <input type="number" name="adjust" v-model="item.adjust" class="col-sm-8 form-control">
                                         <input class="" type="button" name="add" value="+" @Click="AddItemNb(item)">                                        
                                     </div>
                                 </li>
                                 <li class="list-group-item add" >
-                                    <input class="" type="text" name="name" v-model="newItem.name">
-                                    <input class="" type="number" name="number" placeholder="初始數量" v-model="newItem.number">
+                                    <input class="form-control col-sm-2" type="text" name="name" v-model="newItem.name">
+                                    <input class="form-control col-sm-1" type="number" name="number" placeholder="初始數量" v-model="newItem.number">
 
-                                    <select name="itemtype" v-model="newItem.typeid">                                          
+                                    <select name="itemtype" v-model="newItem.typeid" class="form-control col-sm-2">                                          
                                         <option :value="null" disabled selected>選擇類別</option>
                                         <option v-for="type in DBList[1].data" :value="type.id">
                                             {{type.name}} 
@@ -184,7 +186,7 @@
                                         <input type="button" class="btn btn-success btnfr" @click="EditType($event)" value="編輯"></input>
                                     </div>
                                     <div class="editmod">
-                                        <input type="text" name="name" v-model="type.name">
+                                        <input type="text" name="name" v-model="type.name" class="form-control col-sm-2 col-8">
                                         <input type="button" class="btn btn-primary btnfr" @Click="SaveType($event)" value="儲存"></input>
                                     </div>                                    
                                 </li>
@@ -217,13 +219,13 @@
                         <div v-if="LeftMenu[3].show" class="stockitemLog">
                             <h2>{{LeftMenu[3].name}}</h2>
                             <div>
-                                <textarea v-model="DataStr" style="width: 1000px;min-height: 120px;"></textarea>
+                                <textarea class="col-sm-10" v-model="DataStr" class="datastrclass"></textarea>
                                 <input type="button" @click="LoadDataByStr()" class="btn btn-primary" value="匯入">
                             </div>
                             <hr>
                             <div>
                                 寄信給自己
-                                <input v-model="useremail" type="text" placeholder="email" style="width: 200px;">
+                                <input class="col-sm-4" v-model="useremail" type="text" placeholder="email">
                                 <input type="button" @click="SendEmail(useremail);" class="btn btn-primary" value="寄送">
                             </div>
                             <hr>
