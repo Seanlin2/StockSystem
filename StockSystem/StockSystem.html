@@ -45,6 +45,16 @@
             display: none;
         }
 
+        .columnboxhd{
+            display: inline-block;
+            margin: 0px 5px;
+            min-width: 100px;
+            /* background-color:aliceblue; */
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+        }
+        
         .columnbox{
             display: inline-block;
             margin: 0px 5px;
@@ -53,6 +63,10 @@
             border-radius: 5px;
             padding: 5px;
             text-align: center;
+        }
+
+        .btnfr{
+            float: right
         }
 
         @media only screen and (max-width: 576px) {
@@ -128,12 +142,11 @@
                             <h2>{{LeftMenu[0].name}}</h2>
                             <ul class="list-group">
                                 <li class="list-group-item" >
-                                    <div class="columnbox">編號</div>
-                                    <div class="columnbox">名稱</div>
-                                    <div class="columnbox">類別</div>
-                                    <div class="columnbox">庫存</div>
-                                    <div class="columnbox">管理</div>
-                                    
+                                    <div class="columnboxhd">編號</div>
+                                    <div class="columnboxhd">名稱</div>
+                                    <div class="columnboxhd">類別</div>
+                                    <div class="columnboxhd">庫存</div>
+                                    <div class="columnboxhd">管理</div>
                                 </li>
                                 <li class="list-group-item" v-for="item in DBList[0].data">
                                     <div class="columnbox">{{item.id}} </div>
@@ -141,9 +154,8 @@
                                     <div class="columnbox">{{GetItemFormArrById(DBList[1].data,item.typeid).name}} </div>
                                     <div class="columnbox">{{item.number}} </div>
                                     <div class="columnbox">
-                                        <input type="number" name="adjust" style="width: 40px;" >
-                                        <input class="" type="button" name="add" value="+" @Click="AddItemNb(item,this)">
-                                        <input class="" type="button" name="minor" value="-" @Click="MinorItemNb(item,this)">
+                                        <input type="number" name="adjust" style="width: 52px;" v-model="item.adjust" >
+                                        <input class="" type="button" name="add" value="+" @Click="AddItemNb(item)">                                        
                                     </div>
                                 </li>
                                 <li class="list-group-item add" >
@@ -160,31 +172,47 @@
                                     <input type="button" class="btn btn-primary" title="Add" @Click="AddItem()" value="新增"></input>
                                 </li>
                             </ul>
-                        </div>
-                    
+                        </div>                    
                     
                         <div v-if="LeftMenu[1].show" class="stockitemtype">
                             <h2>{{LeftMenu[1].name}}</h2>
                             <ul class="list-group">
                                 <li class="list-group-item" v-for="type in DBList[1].data">
-                                    <div class="viewmod">{{type.name}} </div>
-                                    <input class="editmod" type="text" name="name" value="type.name">
+                                    <div class="viewmod">
+                                        {{type.name}} 
+                                        <input type="button" class="btn btn-success btnfr" @click="EditType($event)" value="編輯"></input>
+                                    </div>
+                                    <div class="editmod">
+                                        <input type="text" name="name" v-model="type.name">
+                                        <input type="button" class="btn btn-primary btnfr" @Click="SaveType($event)" value="儲存"></input>
+                                    </div>                                    
                                 </li>
                                 <li class="list-group-item add">
                                     <input class="" v-model="newType.name" type="text" name="name">
-                                    <input type="button" class="btn btn-primary" title="Add" @Click="AddType()" value="新增"></input>
+                                    <input type="button" class="btn btn-primary" @Click="AddType()" value="新增"></input>
                                 </li>
                             </ul>
-                        </div>
-                    
+                        </div>                    
                     
                         <div v-if="LeftMenu[2].show" class="stockitemLog">
                             <h2>{{LeftMenu[2].name}}</h2>
                             <ul class="list-group">
-                                <li class="list-group-item">111</li>
-                                <li class="list-group-item">111</li>
+                                <li class="list-group-item" >
+                                    <div class="columnboxhd">名稱</div>
+                                    <div class="columnboxhd">調整數量</div>
+                                    <div class="columnboxhd">庫存</div>
+                                    <div class="columnboxhd">時間</div>
+                                </li>
+                                <li class="list-group-item"  v-for="log in DBList[2].data" >                                    
+                                    <div class="columnbox">{{GetItemFormArrById(DBList[0].data,log.itemid).name }} </div>
+                                    <div class="columnbox">{{log.adjust}} </div>
+                                    <div class="columnbox">{{log.number}} </div>
+                                    <div class="columnbox">{{log.datetime}} </div>
+                                </li>
+                                
                             </ul>
                         </div>
+
                         <div v-if="LeftMenu[3].show" class="stockitemLog">
                             <h2>{{LeftMenu[3].name}}</h2>
                             <div>
@@ -193,9 +221,9 @@
                             </div>
                             <hr>
                             <div>
-                            寄信給自己
-                            <input v-model="useremail" type="text" placeholder="email" style="width: 200px;">
-                            <input type="button" @click="SendEmail(useremail);" value="寄送">
+                                寄信給自己
+                                <input v-model="useremail" type="text" placeholder="email" style="width: 200px;">
+                                <input type="button" @click="SendEmail(useremail);" value="寄送">
                             </div>
                         </div>
                     </div>
@@ -220,9 +248,9 @@
                 {name:'匯入匯出',id:4,show:false}
                 ],
             DataStr:"",
-            newItem:{id:0,name:"名稱",typeid:null,number:0},
+            newItem:{id:0,name:"名稱",typeid:null,number:0,adjust:0},
             newType:{id:0,name:"名稱"},            
-            newLog:{datetime:new Date(),adjust:0,itemid:0},
+            //newLog:{datetime:new Date(),adjust:0,itemid:0,number:0},
             useremail:""
         },
         created: function () {
@@ -238,6 +266,8 @@
                     case 0:
                     if(this.DBList[1].data.length == 0){
                         this.DBList[1].data = JSON.parse('{"id":2,"name":"StockItemType","data":[{"id":1,"name":"餃類"},{"id":2,"name":"包子類"},{"id":3,"name":"酥餅"},{"id":4,"name":"甜品"}],"lastid":4}');
+                        //save
+                        this.SaveData();
                     }
                     break;
                 }
@@ -252,22 +282,44 @@
                 this.AddTable('StockItemType');
                 this.AddTable('StockItemLog');
             },
-            AddItemNb(item,e){
+            EditType(event){
+                $(".editmod",$(event.target).parent().parent()).show();
+                $(".viewmod",$(event.target).parent().parent()).hide();
+            },
+            SaveType(event){
+                $(".editmod",$(event.target).parent().parent()).hide();
+                $(".viewmod",$(event.target).parent().parent()).show();
+                //save
+                this.SaveData();
+            },
+            AddItemNb(item){
+                //add
+                item.number = Number(item.number) + Number(item.adjust);
                 console.log(item);
-                console.log(e);
+                //Log
+                //this.newLog.datetime = new Date();
+                this._data.DBList[2].data.push({
+                    datetime:new Date(),
+                    adjust:Number(item.adjust),
+                    itemid:item.id,
+                    number:Number(item.number)
+                })
+                //Clear
+                item.adjust = 0;
+                //save
+                this.SaveData();
             },
             AddItem(){
                 //add
                 this.newItem.id = this._data.DBList[0].lastid +1;
                 this._data.DBList[0].lastid += 1;
-                this._data.DBList[0].data.push(
-                    {
+                this._data.DBList[0].data.push({
                         id:this.newItem.id,
                         name:this.newItem.name,
                         typeid:this.newItem.typeid,
-                        number:this.newItem.number
-                    }
-                )
+                        number:this.newItem.number,
+                        adjust:this.newItem.number
+                })
                 //save
                 this.SaveData();
                 //clear
