@@ -272,7 +272,7 @@
                 switch(shopid){
                     case 0:
                     if(this.DBList[1].data.length == 0){
-                        this.DBList[1].data = JSON.parse('{"id":2,"name":"StockItemType","data":[{"id":1,"name":"餃類"},{"id":2,"name":"包子類"},{"id":3,"name":"酥餅"},{"id":4,"name":"甜品"}],"lastid":4}');
+                        this.DBList[1] = JSON.parse('{"id":2,"name":"StockItemType","data":[{"id":1,"name":"餃類"},{"id":2,"name":"包子類"},{"id":3,"name":"酥餅"},{"id":4,"name":"甜品"}],"lastid":4}');
                         //save
                         this.SaveData();
                     }
