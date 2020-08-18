@@ -168,13 +168,13 @@
                                     <div class="col-2 col-sm-3 columnbox">{{GetItemFormArrById(DBList[1].data,item.typeid).name}} </div>
                                     <div class="col-2 col-sm-2 columnbox">{{item.number}} </div>
                                     <div class="col-2 col-sm-2 btn-group">
-                                        <input type="number" name="adjust" v-model="item.adjust" class="col-1 col-sm-8 form-control">
-                                        <input class="" type="button" name="add" value="+" @Click="AddItemNb(item)">                                        
+                                        <input type="number" name="adjust" v-model="item.adjust" class="col-sm-8 form-control" style="width: 60px;">
+                                        <input class="" type="button" name="add" value="+" @Click="AddItemNb(item)" style="border-radius: 5px; border: 1px;">                                        
                                     </div>
                                 </li>
                                 <li class="list-group-item add narcol" >
                                     <div>新增</div>
-                                    <input class="form-control col-sm-2 col-3" type="text" name="name" v-model="newItem.name">
+                                    <input class="form-control col-sm-2 col-3" type="text" name="name" placeholder="名稱" v-model="newItem.name">
                                     <input class="form-control col-sm-1 col-2" type="number" name="number" placeholder="初始數量" v-model="newItem.number">
 
                                     <select name="itemtype" v-model="newItem.typeid" class="form-control col-sm-2 col-4">                                          
@@ -203,7 +203,7 @@
                                     </div>                                    
                                 </li>
                                 <li class="list-group-item add">
-                                    <input class="" v-model="newType.name" type="text" name="name">
+                                    <input class="" v-model="newType.name" placeholder="名稱" type="text" name="name">
                                     <input type="button" class="btn btn-primary" @Click="AddType()" value="新增"></input>
                                 </li>
                             </ul>
@@ -267,8 +267,8 @@
                 {name:'匯入匯出',id:4,show:false}
                 ],
             DataStr:"",
-            newItem:{id:0,name:"名稱",typeid:null,number:0,adjust:0},
-            newType:{id:0,name:"名稱"},            
+            newItem:{id:0,name:"",typeid:null,number:0,adjust:0},
+            newType:{id:0,name:""},            
             //newLog:{datetime:new Date(),adjust:0,itemid:0,number:0},
             useremail:""
         },
