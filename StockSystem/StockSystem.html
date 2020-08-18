@@ -49,7 +49,6 @@
         .columnboxhd{
             display: inline-block;
             margin: 0px 5px;
-            min-width: 100px;
             /* background-color:aliceblue; */
             border-radius: 5px;
             padding: 5px;
@@ -58,8 +57,7 @@
         
         .columnbox{
             display: inline-block;
-            margin: 0px 5px;
-            min-width: 100px;
+            margin: 0px 5px;            
             background-color: aliceblue;
             border-radius: 5px;
             padding: 5px;
@@ -75,15 +73,22 @@
         @media only screen and (max-width: 576px) {
             .left_menu{                
                 padding: 0px;
+            }          
+            .narcol{
+                padding: 12px 0px;
             }
-
         }   
         @media only screen and (min-width: 576px) {
             .left_menu .btn {
                 /* color: rgba(2, 255, 255, .5);   */
                 width: 100%;          
             }
-
+            .columnboxhd{
+                min-width: 100px;
+            }
+            .columnbox{
+                min-width: 100px;
+            }
         }
     
         @media only screen and (min-width: 768px) {    
@@ -144,35 +149,36 @@
                         <div v-if="LeftMenu[0].show" class="stockitem">
                             <h2>{{LeftMenu[0].name}}</h2>
                             <ul class="list-group">
-                                <li class="list-group-item" >
-                                    <div class="col-sm-1 columnboxhd">編號</div>
-                                    <div class="col-sm-3 columnboxhd">名稱</div>
-                                    <div class="col-sm-3 columnboxhd">類別</div>
-                                    <div class="col-sm-2 columnboxhd">庫存</div>
-                                    <div class="col-sm-2 columnboxhd">管理</div>
+                                <li class="list-group-item narcol" >
+                                    <div class="col-1 col-sm-1 columnboxhd">Id</div>
+                                    <div class="col-2 col-sm-3 columnboxhd">名稱</div>
+                                    <div class="col-2 col-sm-3 columnboxhd">類別</div>
+                                    <div class="col-2 col-sm-2 columnboxhd">庫存</div>
+                                    <div class="col-2 col-sm-2 columnboxhd">管理</div>
                                 </li>
-                                <li class="list-group-item" v-for="item in DBList[0].data">
-                                    <div class="col-sm-1 columnbox">{{item.id}} </div>
-                                    <div class="col-sm-3 columnbox">{{item.name}} </div>
-                                    <div class="col-sm-3 columnbox">{{GetItemFormArrById(DBList[1].data,item.typeid).name}} </div>
-                                    <div class="col-sm-2 columnbox">{{item.number}} </div>
-                                    <div class="col-sm-2 columnbox">
-                                        <input type="number" name="adjust" v-model="item.adjust" class="col-sm-8 form-control">
+                                <li class="list-group-item narcol" v-for="item in DBList[0].data">
+                                    <div class="col-1 col-sm-1 columnbox">{{item.id}} </div>
+                                    <div class="col-2 col-sm-3 columnbox">{{item.name}} </div>
+                                    <div class="col-2 col-sm-3 columnbox">{{GetItemFormArrById(DBList[1].data,item.typeid).name}} </div>
+                                    <div class="col-2 col-sm-2 columnbox">{{item.number}} </div>
+                                    <div class="col-2 col-sm-2 btn-group">
+                                        <input type="number" name="adjust" v-model="item.adjust" class="col-1 col-sm-8 form-control">
                                         <input class="" type="button" name="add" value="+" @Click="AddItemNb(item)">                                        
                                     </div>
                                 </li>
                                 <li class="list-group-item add" >
-                                    <input class="form-control col-sm-2" type="text" name="name" v-model="newItem.name">
-                                    <input class="form-control col-sm-1" type="number" name="number" placeholder="初始數量" v-model="newItem.number">
+                                    <div>新增</div>
+                                    <input class="form-control col-sm-2 col-4" type="text" name="name" v-model="newItem.name">
+                                    <input class="form-control col-sm-1 col-2" type="number" name="number" placeholder="初始數量" v-model="newItem.number">
 
-                                    <select name="itemtype" v-model="newItem.typeid" class="form-control col-sm-2">                                          
+                                    <select name="itemtype" v-model="newItem.typeid" class="form-control col-sm-2 col-3">                                          
                                         <option :value="null" disabled selected>選擇類別</option>
                                         <option v-for="type in DBList[1].data" :value="type.id">
                                             {{type.name}} 
                                         </option>
                                     </select>
 
-                                    <input type="button" class="btn btn-primary" title="Add" @Click="AddItem()" value="新增"></input>
+                                    <input type="button" class="btn btn-primary  col-2" title="Add" @Click="AddItem()" value="新增"></input>
                                 </li>
                             </ul>
                         </div>                    
@@ -275,6 +281,8 @@
                         this.DBList[1] = JSON.parse('{"id":2,"name":"StockItemType","data":[{"id":1,"name":"餃類"},{"id":2,"name":"包子類"},{"id":3,"name":"酥餅"},{"id":4,"name":"甜品"}],"lastid":4}');
                         //save
                         this.SaveData();
+                        //
+                        alert('匯入分類成功');
                     }
                     break;
                 }
