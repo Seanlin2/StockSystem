@@ -448,6 +448,8 @@
             },
             ClearData(){                
                 localStorage.removeItem('Alldata');
+                this.LoadData();
+                alert('重設成功');
                 //setItem(): Add key and value to localStorage
                 //getItem(): Retrieve a value by the key from localStorage
                 //removeItem(): Remove an item by key from localStorage
